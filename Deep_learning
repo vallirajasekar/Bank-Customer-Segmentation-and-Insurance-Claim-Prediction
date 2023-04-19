@@ -1,0 +1,2357 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "gpuType": "T4",
+      "authorship_tag": "ABX9TyNN84+rCuk7Z/SW0OM7U90A",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    },
+    "accelerator": "GPU",
+    "gpuClass": "standard"
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/vallirajasekar/Bank-Customer-Segmentation-and-Insurance-Claim-Prediction/blob/main/Deep_learning\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "9PFsV6-gLAG3",
+        "outputId": "4bb98486-3ef1-4d8c-b3c3-cdae4dd11d59"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Looking in indexes: https://pypi.org/simple, https://us-python.pkg.dev/colab-wheels/public/simple/\n",
+            "Requirement already satisfied: pip in /usr/local/lib/python3.9/dist-packages (23.1)\n",
+            "\u001b[33mWARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv\u001b[0m\u001b[33m\n",
+            "\u001b[0mLooking in indexes: https://pypi.org/simple, https://us-python.pkg.dev/colab-wheels/public/simple/\n",
+            "Requirement already satisfied: setuptools in /usr/local/lib/python3.9/dist-packages (67.6.1)\n",
+            "\u001b[33mWARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv\u001b[0m\u001b[33m\n",
+            "\u001b[0m"
+          ]
+        }
+      ],
+      "source": [
+        "!pip install --upgrade pip\n",
+        "!pip install --upgrade setuptools\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install tensorflow "
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "KAObrJBaSS2Y",
+        "outputId": "fbb3b1eb-8be5-46d8-bc91-a883e1efa931"
+      },
+      "execution_count": 2,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Looking in indexes: https://pypi.org/simple, https://us-python.pkg.dev/colab-wheels/public/simple/\n",
+            "Requirement already satisfied: tensorflow in /usr/local/lib/python3.9/dist-packages (2.12.0)\n",
+            "Requirement already satisfied: absl-py>=1.0.0 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (1.4.0)\n",
+            "Requirement already satisfied: astunparse>=1.6.0 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (1.6.3)\n",
+            "Requirement already satisfied: flatbuffers>=2.0 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (23.3.3)\n",
+            "Requirement already satisfied: gast<=0.4.0,>=0.2.1 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (0.4.0)\n",
+            "Requirement already satisfied: google-pasta>=0.1.1 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (0.2.0)\n",
+            "Requirement already satisfied: grpcio<2.0,>=1.24.3 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (1.53.0)\n",
+            "Requirement already satisfied: h5py>=2.9.0 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (3.8.0)\n",
+            "Requirement already satisfied: jax>=0.3.15 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (0.4.8)\n",
+            "Requirement already satisfied: keras<2.13,>=2.12.0 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (2.12.0)\n",
+            "Requirement already satisfied: libclang>=13.0.0 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (16.0.0)\n",
+            "Requirement already satisfied: numpy<1.24,>=1.22 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (1.22.4)\n",
+            "Requirement already satisfied: opt-einsum>=2.3.2 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (3.3.0)\n",
+            "Requirement already satisfied: packaging in /usr/local/lib/python3.9/dist-packages (from tensorflow) (23.1)\n",
+            "Requirement already satisfied: protobuf!=4.21.0,!=4.21.1,!=4.21.2,!=4.21.3,!=4.21.4,!=4.21.5,<5.0.0dev,>=3.20.3 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (3.20.3)\n",
+            "Requirement already satisfied: setuptools in /usr/local/lib/python3.9/dist-packages (from tensorflow) (67.6.1)\n",
+            "Requirement already satisfied: six>=1.12.0 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (1.16.0)\n",
+            "Requirement already satisfied: tensorboard<2.13,>=2.12 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (2.12.2)\n",
+            "Requirement already satisfied: tensorflow-estimator<2.13,>=2.12.0 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (2.12.0)\n",
+            "Requirement already satisfied: termcolor>=1.1.0 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (2.2.0)\n",
+            "Requirement already satisfied: typing-extensions>=3.6.6 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (4.5.0)\n",
+            "Requirement already satisfied: wrapt<1.15,>=1.11.0 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (1.14.1)\n",
+            "Requirement already satisfied: tensorflow-io-gcs-filesystem>=0.23.1 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (0.32.0)\n",
+            "Requirement already satisfied: wheel<1.0,>=0.23.0 in /usr/local/lib/python3.9/dist-packages (from astunparse>=1.6.0->tensorflow) (0.40.0)\n",
+            "Requirement already satisfied: ml-dtypes>=0.0.3 in /usr/local/lib/python3.9/dist-packages (from jax>=0.3.15->tensorflow) (0.1.0)\n",
+            "Requirement already satisfied: scipy>=1.7 in /usr/local/lib/python3.9/dist-packages (from jax>=0.3.15->tensorflow) (1.10.1)\n",
+            "Requirement already satisfied: google-auth<3,>=1.6.3 in /usr/local/lib/python3.9/dist-packages (from tensorboard<2.13,>=2.12->tensorflow) (2.17.3)\n",
+            "Requirement already satisfied: google-auth-oauthlib<1.1,>=0.5 in /usr/local/lib/python3.9/dist-packages (from tensorboard<2.13,>=2.12->tensorflow) (1.0.0)\n",
+            "Requirement already satisfied: markdown>=2.6.8 in /usr/local/lib/python3.9/dist-packages (from tensorboard<2.13,>=2.12->tensorflow) (3.4.3)\n",
+            "Requirement already satisfied: requests<3,>=2.21.0 in /usr/local/lib/python3.9/dist-packages (from tensorboard<2.13,>=2.12->tensorflow) (2.27.1)\n",
+            "Requirement already satisfied: tensorboard-data-server<0.8.0,>=0.7.0 in /usr/local/lib/python3.9/dist-packages (from tensorboard<2.13,>=2.12->tensorflow) (0.7.0)\n",
+            "Requirement already satisfied: tensorboard-plugin-wit>=1.6.0 in /usr/local/lib/python3.9/dist-packages (from tensorboard<2.13,>=2.12->tensorflow) (1.8.1)\n",
+            "Requirement already satisfied: werkzeug>=1.0.1 in /usr/local/lib/python3.9/dist-packages (from tensorboard<2.13,>=2.12->tensorflow) (2.2.3)\n",
+            "Requirement already satisfied: cachetools<6.0,>=2.0.0 in /usr/local/lib/python3.9/dist-packages (from google-auth<3,>=1.6.3->tensorboard<2.13,>=2.12->tensorflow) (5.3.0)\n",
+            "Requirement already satisfied: pyasn1-modules>=0.2.1 in /usr/local/lib/python3.9/dist-packages (from google-auth<3,>=1.6.3->tensorboard<2.13,>=2.12->tensorflow) (0.2.8)\n",
+            "Requirement already satisfied: rsa<5,>=3.1.4 in /usr/local/lib/python3.9/dist-packages (from google-auth<3,>=1.6.3->tensorboard<2.13,>=2.12->tensorflow) (4.9)\n",
+            "Requirement already satisfied: requests-oauthlib>=0.7.0 in /usr/local/lib/python3.9/dist-packages (from google-auth-oauthlib<1.1,>=0.5->tensorboard<2.13,>=2.12->tensorflow) (1.3.1)\n",
+            "Requirement already satisfied: importlib-metadata>=4.4 in /usr/local/lib/python3.9/dist-packages (from markdown>=2.6.8->tensorboard<2.13,>=2.12->tensorflow) (6.4.1)\n",
+            "Requirement already satisfied: urllib3<1.27,>=1.21.1 in /usr/local/lib/python3.9/dist-packages (from requests<3,>=2.21.0->tensorboard<2.13,>=2.12->tensorflow) (1.26.15)\n",
+            "Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.9/dist-packages (from requests<3,>=2.21.0->tensorboard<2.13,>=2.12->tensorflow) (2022.12.7)\n",
+            "Requirement already satisfied: charset-normalizer~=2.0.0 in /usr/local/lib/python3.9/dist-packages (from requests<3,>=2.21.0->tensorboard<2.13,>=2.12->tensorflow) (2.0.12)\n",
+            "Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.9/dist-packages (from requests<3,>=2.21.0->tensorboard<2.13,>=2.12->tensorflow) (3.4)\n",
+            "Requirement already satisfied: MarkupSafe>=2.1.1 in /usr/local/lib/python3.9/dist-packages (from werkzeug>=1.0.1->tensorboard<2.13,>=2.12->tensorflow) (2.1.2)\n",
+            "Requirement already satisfied: zipp>=0.5 in /usr/local/lib/python3.9/dist-packages (from importlib-metadata>=4.4->markdown>=2.6.8->tensorboard<2.13,>=2.12->tensorflow) (3.15.0)\n",
+            "Requirement already satisfied: pyasn1<0.5.0,>=0.4.6 in /usr/local/lib/python3.9/dist-packages (from pyasn1-modules>=0.2.1->google-auth<3,>=1.6.3->tensorboard<2.13,>=2.12->tensorflow) (0.4.8)\n",
+            "Requirement already satisfied: oauthlib>=3.0.0 in /usr/local/lib/python3.9/dist-packages (from requests-oauthlib>=0.7.0->google-auth-oauthlib<1.1,>=0.5->tensorboard<2.13,>=2.12->tensorflow) (3.2.2)\n",
+            "\u001b[33mWARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv\u001b[0m\u001b[33m\n",
+            "\u001b[0m"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "pip install tensorflow-gpu==2.12.0\n"
+      ],
+      "metadata": {
+        "id": "BQCJljsaSlYB",
+        "outputId": "e7dfa04c-0bb1-446c-86e7-312d568734cf",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        }
+      },
+      "execution_count": 3,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Looking in indexes: https://pypi.org/simple, https://us-python.pkg.dev/colab-wheels/public/simple/\n",
+            "Collecting tensorflow-gpu==2.12.0\n",
+            "  Using cached tensorflow-gpu-2.12.0.tar.gz (2.6 kB)\n",
+            "  \u001b[1;31merror\u001b[0m: \u001b[1msubprocess-exited-with-error\u001b[0m\n",
+            "  \n",
+            "  \u001b[31m×\u001b[0m \u001b[32mpython setup.py egg_info\u001b[0m did not run successfully.\n",
+            "  \u001b[31m│\u001b[0m exit code: \u001b[1;36m1\u001b[0m\n",
+            "  \u001b[31m╰─>\u001b[0m See above for output.\n",
+            "  \n",
+            "  \u001b[1;35mnote\u001b[0m: This error originates from a subprocess, and is likely not a problem with pip.\n",
+            "  Preparing metadata (setup.py) ... \u001b[?25l\u001b[?25herror\n",
+            "\u001b[1;31merror\u001b[0m: \u001b[1mmetadata-generation-failed\u001b[0m\n",
+            "\n",
+            "\u001b[31m×\u001b[0m Encountered error while generating package metadata.\n",
+            "\u001b[31m╰─>\u001b[0m See above for output.\n",
+            "\n",
+            "\u001b[1;35mnote\u001b[0m: This is an issue with the package mentioned above, not pip.\n",
+            "\u001b[1;36mhint\u001b[0m: See above for details.\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "pip install tensorflow-gpu\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "emXE8rLqR4GR",
+        "outputId": "cc519838-657f-44e7-e47b-088d2cd3d0e7"
+      },
+      "execution_count": 4,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Looking in indexes: https://pypi.org/simple, https://us-python.pkg.dev/colab-wheels/public/simple/\n",
+            "Collecting tensorflow-gpu\n",
+            "  Using cached tensorflow-gpu-2.12.0.tar.gz (2.6 kB)\n",
+            "  \u001b[1;31merror\u001b[0m: \u001b[1msubprocess-exited-with-error\u001b[0m\n",
+            "  \n",
+            "  \u001b[31m×\u001b[0m \u001b[32mpython setup.py egg_info\u001b[0m did not run successfully.\n",
+            "  \u001b[31m│\u001b[0m exit code: \u001b[1;36m1\u001b[0m\n",
+            "  \u001b[31m╰─>\u001b[0m See above for output.\n",
+            "  \n",
+            "  \u001b[1;35mnote\u001b[0m: This error originates from a subprocess, and is likely not a problem with pip.\n",
+            "  Preparing metadata (setup.py) ... \u001b[?25l\u001b[?25herror\n",
+            "\u001b[1;31merror\u001b[0m: \u001b[1mmetadata-generation-failed\u001b[0m\n",
+            "\n",
+            "\u001b[31m×\u001b[0m Encountered error while generating package metadata.\n",
+            "\u001b[31m╰─>\u001b[0m See above for output.\n",
+            "\n",
+            "\u001b[1;35mnote\u001b[0m: This is an issue with the package mentioned above, not pip.\n",
+            "\u001b[1;36mhint\u001b[0m: See above for details.\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install tensorflow-gpu\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "vALSckMqMlAj",
+        "outputId": "2ed28252-7379-47c7-ff73-2907abd8e12a"
+      },
+      "execution_count": 5,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Looking in indexes: https://pypi.org/simple, https://us-python.pkg.dev/colab-wheels/public/simple/\n",
+            "Collecting tensorflow-gpu\n",
+            "  Using cached tensorflow-gpu-2.12.0.tar.gz (2.6 kB)\n",
+            "  \u001b[1;31merror\u001b[0m: \u001b[1msubprocess-exited-with-error\u001b[0m\n",
+            "  \n",
+            "  \u001b[31m×\u001b[0m \u001b[32mpython setup.py egg_info\u001b[0m did not run successfully.\n",
+            "  \u001b[31m│\u001b[0m exit code: \u001b[1;36m1\u001b[0m\n",
+            "  \u001b[31m╰─>\u001b[0m See above for output.\n",
+            "  \n",
+            "  \u001b[1;35mnote\u001b[0m: This error originates from a subprocess, and is likely not a problem with pip.\n",
+            "  Preparing metadata (setup.py) ... \u001b[?25l\u001b[?25herror\n",
+            "\u001b[1;31merror\u001b[0m: \u001b[1mmetadata-generation-failed\u001b[0m\n",
+            "\n",
+            "\u001b[31m×\u001b[0m Encountered error while generating package metadata.\n",
+            "\u001b[31m╰─>\u001b[0m See above for output.\n",
+            "\n",
+            "\u001b[1;35mnote\u001b[0m: This is an issue with the package mentioned above, not pip.\n",
+            "\u001b[1;36mhint\u001b[0m: See above for details.\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "LIFMESN9qEwn"
+      },
+      "execution_count": 5,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "mxJw43sWrN9y"
+      },
+      "execution_count": 5,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "TvdN6dYKrWTp"
+      },
+      "execution_count": 5,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "nBZNZVoaoNSg"
+      },
+      "execution_count": 5,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install --upgrade tensorflow"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "2NWmsuuKoNTT",
+        "outputId": "cd9426e1-9468-48c3-a370-1818bd9d112c"
+      },
+      "execution_count": 6,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Looking in indexes: https://pypi.org/simple, https://us-python.pkg.dev/colab-wheels/public/simple/\n",
+            "Requirement already satisfied: tensorflow in /usr/local/lib/python3.9/dist-packages (2.12.0)\n",
+            "Requirement already satisfied: absl-py>=1.0.0 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (1.4.0)\n",
+            "Requirement already satisfied: astunparse>=1.6.0 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (1.6.3)\n",
+            "Requirement already satisfied: flatbuffers>=2.0 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (23.3.3)\n",
+            "Requirement already satisfied: gast<=0.4.0,>=0.2.1 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (0.4.0)\n",
+            "Requirement already satisfied: google-pasta>=0.1.1 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (0.2.0)\n",
+            "Requirement already satisfied: grpcio<2.0,>=1.24.3 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (1.53.0)\n",
+            "Requirement already satisfied: h5py>=2.9.0 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (3.8.0)\n",
+            "Requirement already satisfied: jax>=0.3.15 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (0.4.8)\n",
+            "Requirement already satisfied: keras<2.13,>=2.12.0 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (2.12.0)\n",
+            "Requirement already satisfied: libclang>=13.0.0 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (16.0.0)\n",
+            "Requirement already satisfied: numpy<1.24,>=1.22 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (1.22.4)\n",
+            "Requirement already satisfied: opt-einsum>=2.3.2 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (3.3.0)\n",
+            "Requirement already satisfied: packaging in /usr/local/lib/python3.9/dist-packages (from tensorflow) (23.1)\n",
+            "Requirement already satisfied: protobuf!=4.21.0,!=4.21.1,!=4.21.2,!=4.21.3,!=4.21.4,!=4.21.5,<5.0.0dev,>=3.20.3 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (3.20.3)\n",
+            "Requirement already satisfied: setuptools in /usr/local/lib/python3.9/dist-packages (from tensorflow) (67.6.1)\n",
+            "Requirement already satisfied: six>=1.12.0 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (1.16.0)\n",
+            "Requirement already satisfied: tensorboard<2.13,>=2.12 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (2.12.2)\n",
+            "Requirement already satisfied: tensorflow-estimator<2.13,>=2.12.0 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (2.12.0)\n",
+            "Requirement already satisfied: termcolor>=1.1.0 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (2.2.0)\n",
+            "Requirement already satisfied: typing-extensions>=3.6.6 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (4.5.0)\n",
+            "Requirement already satisfied: wrapt<1.15,>=1.11.0 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (1.14.1)\n",
+            "Requirement already satisfied: tensorflow-io-gcs-filesystem>=0.23.1 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (0.32.0)\n",
+            "Requirement already satisfied: wheel<1.0,>=0.23.0 in /usr/local/lib/python3.9/dist-packages (from astunparse>=1.6.0->tensorflow) (0.40.0)\n",
+            "Requirement already satisfied: ml-dtypes>=0.0.3 in /usr/local/lib/python3.9/dist-packages (from jax>=0.3.15->tensorflow) (0.1.0)\n",
+            "Requirement already satisfied: scipy>=1.7 in /usr/local/lib/python3.9/dist-packages (from jax>=0.3.15->tensorflow) (1.10.1)\n",
+            "Requirement already satisfied: google-auth<3,>=1.6.3 in /usr/local/lib/python3.9/dist-packages (from tensorboard<2.13,>=2.12->tensorflow) (2.17.3)\n",
+            "Requirement already satisfied: google-auth-oauthlib<1.1,>=0.5 in /usr/local/lib/python3.9/dist-packages (from tensorboard<2.13,>=2.12->tensorflow) (1.0.0)\n",
+            "Requirement already satisfied: markdown>=2.6.8 in /usr/local/lib/python3.9/dist-packages (from tensorboard<2.13,>=2.12->tensorflow) (3.4.3)\n",
+            "Requirement already satisfied: requests<3,>=2.21.0 in /usr/local/lib/python3.9/dist-packages (from tensorboard<2.13,>=2.12->tensorflow) (2.27.1)\n",
+            "Requirement already satisfied: tensorboard-data-server<0.8.0,>=0.7.0 in /usr/local/lib/python3.9/dist-packages (from tensorboard<2.13,>=2.12->tensorflow) (0.7.0)\n",
+            "Requirement already satisfied: tensorboard-plugin-wit>=1.6.0 in /usr/local/lib/python3.9/dist-packages (from tensorboard<2.13,>=2.12->tensorflow) (1.8.1)\n",
+            "Requirement already satisfied: werkzeug>=1.0.1 in /usr/local/lib/python3.9/dist-packages (from tensorboard<2.13,>=2.12->tensorflow) (2.2.3)\n",
+            "Requirement already satisfied: cachetools<6.0,>=2.0.0 in /usr/local/lib/python3.9/dist-packages (from google-auth<3,>=1.6.3->tensorboard<2.13,>=2.12->tensorflow) (5.3.0)\n",
+            "Requirement already satisfied: pyasn1-modules>=0.2.1 in /usr/local/lib/python3.9/dist-packages (from google-auth<3,>=1.6.3->tensorboard<2.13,>=2.12->tensorflow) (0.2.8)\n",
+            "Requirement already satisfied: rsa<5,>=3.1.4 in /usr/local/lib/python3.9/dist-packages (from google-auth<3,>=1.6.3->tensorboard<2.13,>=2.12->tensorflow) (4.9)\n",
+            "Requirement already satisfied: requests-oauthlib>=0.7.0 in /usr/local/lib/python3.9/dist-packages (from google-auth-oauthlib<1.1,>=0.5->tensorboard<2.13,>=2.12->tensorflow) (1.3.1)\n",
+            "Requirement already satisfied: importlib-metadata>=4.4 in /usr/local/lib/python3.9/dist-packages (from markdown>=2.6.8->tensorboard<2.13,>=2.12->tensorflow) (6.4.1)\n",
+            "Requirement already satisfied: urllib3<1.27,>=1.21.1 in /usr/local/lib/python3.9/dist-packages (from requests<3,>=2.21.0->tensorboard<2.13,>=2.12->tensorflow) (1.26.15)\n",
+            "Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.9/dist-packages (from requests<3,>=2.21.0->tensorboard<2.13,>=2.12->tensorflow) (2022.12.7)\n",
+            "Requirement already satisfied: charset-normalizer~=2.0.0 in /usr/local/lib/python3.9/dist-packages (from requests<3,>=2.21.0->tensorboard<2.13,>=2.12->tensorflow) (2.0.12)\n",
+            "Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.9/dist-packages (from requests<3,>=2.21.0->tensorboard<2.13,>=2.12->tensorflow) (3.4)\n",
+            "Requirement already satisfied: MarkupSafe>=2.1.1 in /usr/local/lib/python3.9/dist-packages (from werkzeug>=1.0.1->tensorboard<2.13,>=2.12->tensorflow) (2.1.2)\n",
+            "Requirement already satisfied: zipp>=0.5 in /usr/local/lib/python3.9/dist-packages (from importlib-metadata>=4.4->markdown>=2.6.8->tensorboard<2.13,>=2.12->tensorflow) (3.15.0)\n",
+            "Requirement already satisfied: pyasn1<0.5.0,>=0.4.6 in /usr/local/lib/python3.9/dist-packages (from pyasn1-modules>=0.2.1->google-auth<3,>=1.6.3->tensorboard<2.13,>=2.12->tensorflow) (0.4.8)\n",
+            "Requirement already satisfied: oauthlib>=3.0.0 in /usr/local/lib/python3.9/dist-packages (from requests-oauthlib>=0.7.0->google-auth-oauthlib<1.1,>=0.5->tensorboard<2.13,>=2.12->tensorflow) (3.2.2)\n",
+            "\u001b[33mWARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv\u001b[0m\u001b[33m\n",
+            "\u001b[0m"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install tensorflow-gpu"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "UgfHyheurXFy",
+        "outputId": "0fb7eed9-30d3-4551-db78-44671bb8ab28"
+      },
+      "execution_count": 7,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Looking in indexes: https://pypi.org/simple, https://us-python.pkg.dev/colab-wheels/public/simple/\n",
+            "Collecting tensorflow-gpu\n",
+            "  Using cached tensorflow-gpu-2.12.0.tar.gz (2.6 kB)\n",
+            "  \u001b[1;31merror\u001b[0m: \u001b[1msubprocess-exited-with-error\u001b[0m\n",
+            "  \n",
+            "  \u001b[31m×\u001b[0m \u001b[32mpython setup.py egg_info\u001b[0m did not run successfully.\n",
+            "  \u001b[31m│\u001b[0m exit code: \u001b[1;36m1\u001b[0m\n",
+            "  \u001b[31m╰─>\u001b[0m See above for output.\n",
+            "  \n",
+            "  \u001b[1;35mnote\u001b[0m: This error originates from a subprocess, and is likely not a problem with pip.\n",
+            "  Preparing metadata (setup.py) ... \u001b[?25l\u001b[?25herror\n",
+            "\u001b[1;31merror\u001b[0m: \u001b[1mmetadata-generation-failed\u001b[0m\n",
+            "\n",
+            "\u001b[31m×\u001b[0m Encountered error while generating package metadata.\n",
+            "\u001b[31m╰─>\u001b[0m See above for output.\n",
+            "\n",
+            "\u001b[1;35mnote\u001b[0m: This is an issue with the package mentioned above, not pip.\n",
+            "\u001b[1;36mhint\u001b[0m: See above for details.\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install tensorflow "
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "129zQI74sCCn",
+        "outputId": "59232bd0-466a-44e6-b9d8-929ab6443ed7"
+      },
+      "execution_count": 8,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Looking in indexes: https://pypi.org/simple, https://us-python.pkg.dev/colab-wheels/public/simple/\n",
+            "Requirement already satisfied: tensorflow in /usr/local/lib/python3.9/dist-packages (2.12.0)\n",
+            "Requirement already satisfied: absl-py>=1.0.0 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (1.4.0)\n",
+            "Requirement already satisfied: astunparse>=1.6.0 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (1.6.3)\n",
+            "Requirement already satisfied: flatbuffers>=2.0 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (23.3.3)\n",
+            "Requirement already satisfied: gast<=0.4.0,>=0.2.1 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (0.4.0)\n",
+            "Requirement already satisfied: google-pasta>=0.1.1 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (0.2.0)\n",
+            "Requirement already satisfied: grpcio<2.0,>=1.24.3 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (1.53.0)\n",
+            "Requirement already satisfied: h5py>=2.9.0 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (3.8.0)\n",
+            "Requirement already satisfied: jax>=0.3.15 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (0.4.8)\n",
+            "Requirement already satisfied: keras<2.13,>=2.12.0 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (2.12.0)\n",
+            "Requirement already satisfied: libclang>=13.0.0 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (16.0.0)\n",
+            "Requirement already satisfied: numpy<1.24,>=1.22 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (1.22.4)\n",
+            "Requirement already satisfied: opt-einsum>=2.3.2 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (3.3.0)\n",
+            "Requirement already satisfied: packaging in /usr/local/lib/python3.9/dist-packages (from tensorflow) (23.1)\n",
+            "Requirement already satisfied: protobuf!=4.21.0,!=4.21.1,!=4.21.2,!=4.21.3,!=4.21.4,!=4.21.5,<5.0.0dev,>=3.20.3 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (3.20.3)\n",
+            "Requirement already satisfied: setuptools in /usr/local/lib/python3.9/dist-packages (from tensorflow) (67.6.1)\n",
+            "Requirement already satisfied: six>=1.12.0 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (1.16.0)\n",
+            "Requirement already satisfied: tensorboard<2.13,>=2.12 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (2.12.2)\n",
+            "Requirement already satisfied: tensorflow-estimator<2.13,>=2.12.0 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (2.12.0)\n",
+            "Requirement already satisfied: termcolor>=1.1.0 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (2.2.0)\n",
+            "Requirement already satisfied: typing-extensions>=3.6.6 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (4.5.0)\n",
+            "Requirement already satisfied: wrapt<1.15,>=1.11.0 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (1.14.1)\n",
+            "Requirement already satisfied: tensorflow-io-gcs-filesystem>=0.23.1 in /usr/local/lib/python3.9/dist-packages (from tensorflow) (0.32.0)\n",
+            "Requirement already satisfied: wheel<1.0,>=0.23.0 in /usr/local/lib/python3.9/dist-packages (from astunparse>=1.6.0->tensorflow) (0.40.0)\n",
+            "Requirement already satisfied: ml-dtypes>=0.0.3 in /usr/local/lib/python3.9/dist-packages (from jax>=0.3.15->tensorflow) (0.1.0)\n",
+            "Requirement already satisfied: scipy>=1.7 in /usr/local/lib/python3.9/dist-packages (from jax>=0.3.15->tensorflow) (1.10.1)\n",
+            "Requirement already satisfied: google-auth<3,>=1.6.3 in /usr/local/lib/python3.9/dist-packages (from tensorboard<2.13,>=2.12->tensorflow) (2.17.3)\n",
+            "Requirement already satisfied: google-auth-oauthlib<1.1,>=0.5 in /usr/local/lib/python3.9/dist-packages (from tensorboard<2.13,>=2.12->tensorflow) (1.0.0)\n",
+            "Requirement already satisfied: markdown>=2.6.8 in /usr/local/lib/python3.9/dist-packages (from tensorboard<2.13,>=2.12->tensorflow) (3.4.3)\n",
+            "Requirement already satisfied: requests<3,>=2.21.0 in /usr/local/lib/python3.9/dist-packages (from tensorboard<2.13,>=2.12->tensorflow) (2.27.1)\n",
+            "Requirement already satisfied: tensorboard-data-server<0.8.0,>=0.7.0 in /usr/local/lib/python3.9/dist-packages (from tensorboard<2.13,>=2.12->tensorflow) (0.7.0)\n",
+            "Requirement already satisfied: tensorboard-plugin-wit>=1.6.0 in /usr/local/lib/python3.9/dist-packages (from tensorboard<2.13,>=2.12->tensorflow) (1.8.1)\n",
+            "Requirement already satisfied: werkzeug>=1.0.1 in /usr/local/lib/python3.9/dist-packages (from tensorboard<2.13,>=2.12->tensorflow) (2.2.3)\n",
+            "Requirement already satisfied: cachetools<6.0,>=2.0.0 in /usr/local/lib/python3.9/dist-packages (from google-auth<3,>=1.6.3->tensorboard<2.13,>=2.12->tensorflow) (5.3.0)\n",
+            "Requirement already satisfied: pyasn1-modules>=0.2.1 in /usr/local/lib/python3.9/dist-packages (from google-auth<3,>=1.6.3->tensorboard<2.13,>=2.12->tensorflow) (0.2.8)\n",
+            "Requirement already satisfied: rsa<5,>=3.1.4 in /usr/local/lib/python3.9/dist-packages (from google-auth<3,>=1.6.3->tensorboard<2.13,>=2.12->tensorflow) (4.9)\n",
+            "Requirement already satisfied: requests-oauthlib>=0.7.0 in /usr/local/lib/python3.9/dist-packages (from google-auth-oauthlib<1.1,>=0.5->tensorboard<2.13,>=2.12->tensorflow) (1.3.1)\n",
+            "Requirement already satisfied: importlib-metadata>=4.4 in /usr/local/lib/python3.9/dist-packages (from markdown>=2.6.8->tensorboard<2.13,>=2.12->tensorflow) (6.4.1)\n",
+            "Requirement already satisfied: urllib3<1.27,>=1.21.1 in /usr/local/lib/python3.9/dist-packages (from requests<3,>=2.21.0->tensorboard<2.13,>=2.12->tensorflow) (1.26.15)\n",
+            "Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.9/dist-packages (from requests<3,>=2.21.0->tensorboard<2.13,>=2.12->tensorflow) (2022.12.7)\n",
+            "Requirement already satisfied: charset-normalizer~=2.0.0 in /usr/local/lib/python3.9/dist-packages (from requests<3,>=2.21.0->tensorboard<2.13,>=2.12->tensorflow) (2.0.12)\n",
+            "Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.9/dist-packages (from requests<3,>=2.21.0->tensorboard<2.13,>=2.12->tensorflow) (3.4)\n",
+            "Requirement already satisfied: MarkupSafe>=2.1.1 in /usr/local/lib/python3.9/dist-packages (from werkzeug>=1.0.1->tensorboard<2.13,>=2.12->tensorflow) (2.1.2)\n",
+            "Requirement already satisfied: zipp>=0.5 in /usr/local/lib/python3.9/dist-packages (from importlib-metadata>=4.4->markdown>=2.6.8->tensorboard<2.13,>=2.12->tensorflow) (3.15.0)\n",
+            "Requirement already satisfied: pyasn1<0.5.0,>=0.4.6 in /usr/local/lib/python3.9/dist-packages (from pyasn1-modules>=0.2.1->google-auth<3,>=1.6.3->tensorboard<2.13,>=2.12->tensorflow) (0.4.8)\n",
+            "Requirement already satisfied: oauthlib>=3.0.0 in /usr/local/lib/python3.9/dist-packages (from requests-oauthlib>=0.7.0->google-auth-oauthlib<1.1,>=0.5->tensorboard<2.13,>=2.12->tensorflow) (3.2.2)\n",
+            "\u001b[33mWARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv\u001b[0m\u001b[33m\n",
+            "\u001b[0m"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import tensorflow as tf\n",
+        "print(tf.__version__)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "27yLrkE2sO1k",
+        "outputId": "e8a3a65e-0de1-4d7d-a3e3-e61e7a081fce"
+      },
+      "execution_count": 9,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "2.12.0\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# New section"
+      ],
+      "metadata": {
+        "id": "kT-efMSZLY8H"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import numpy as np\n",
+        "import pandas as pd\n",
+        "import matplotlib.pyplot as plt"
+      ],
+      "metadata": {
+        "id": "oD5oSlTit-b_"
+      },
+      "execution_count": 10,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import os\n",
+        "print(os.getcwd())\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "19AQLTHWxnzU",
+        "outputId": "6785d496-c2a1-43c5-b85d-1e6bb4e19031"
+      },
+      "execution_count": 11,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "/content\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "PY-IQlYGxM7b"
+      },
+      "execution_count": 11,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df=pd.read_csv('Churn_Modelling.csv')"
+      ],
+      "metadata": {
+        "id": "bC-nZoWYvtza"
+      },
+      "execution_count": 12,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.head()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 270
+        },
+        "id": "v8bR262wxzyg",
+        "outputId": "7c03af07-1bdd-439d-b993-08fb30cd7fa4"
+      },
+      "execution_count": 13,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "   RowNumber  CustomerId   Surname  CreditScore Geography  Gender  Age  \\\n",
+              "0          1    15634602  Hargrave          619    France  Female   42   \n",
+              "1          2    15647311      Hill          608     Spain  Female   41   \n",
+              "2          3    15619304      Onio          502    France  Female   42   \n",
+              "3          4    15701354      Boni          699    France  Female   39   \n",
+              "4          5    15737888  Mitchell          850     Spain  Female   43   \n",
+              "\n",
+              "   Tenure    Balance  NumOfProducts  HasCrCard  IsActiveMember  \\\n",
+              "0       2       0.00              1          1               1   \n",
+              "1       1   83807.86              1          0               1   \n",
+              "2       8  159660.80              3          1               0   \n",
+              "3       1       0.00              2          0               0   \n",
+              "4       2  125510.82              1          1               1   \n",
+              "\n",
+              "   EstimatedSalary  Exited  \n",
+              "0        101348.88       1  \n",
+              "1        112542.58       0  \n",
+              "2        113931.57       1  \n",
+              "3         93826.63       0  \n",
+              "4         79084.10       0  "
+            ],
+            "text/html": [
+              "\n",
+              "  <div id=\"df-651c437f-7e39-4e30-91d9-da949a18b4e7\">\n",
+              "    <div class=\"colab-df-container\">\n",
+              "      <div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>RowNumber</th>\n",
+              "      <th>CustomerId</th>\n",
+              "      <th>Surname</th>\n",
+              "      <th>CreditScore</th>\n",
+              "      <th>Geography</th>\n",
+              "      <th>Gender</th>\n",
+              "      <th>Age</th>\n",
+              "      <th>Tenure</th>\n",
+              "      <th>Balance</th>\n",
+              "      <th>NumOfProducts</th>\n",
+              "      <th>HasCrCard</th>\n",
+              "      <th>IsActiveMember</th>\n",
+              "      <th>EstimatedSalary</th>\n",
+              "      <th>Exited</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td>1</td>\n",
+              "      <td>15634602</td>\n",
+              "      <td>Hargrave</td>\n",
+              "      <td>619</td>\n",
+              "      <td>France</td>\n",
+              "      <td>Female</td>\n",
+              "      <td>42</td>\n",
+              "      <td>2</td>\n",
+              "      <td>0.00</td>\n",
+              "      <td>1</td>\n",
+              "      <td>1</td>\n",
+              "      <td>1</td>\n",
+              "      <td>101348.88</td>\n",
+              "      <td>1</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1</th>\n",
+              "      <td>2</td>\n",
+              "      <td>15647311</td>\n",
+              "      <td>Hill</td>\n",
+              "      <td>608</td>\n",
+              "      <td>Spain</td>\n",
+              "      <td>Female</td>\n",
+              "      <td>41</td>\n",
+              "      <td>1</td>\n",
+              "      <td>83807.86</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "      <td>1</td>\n",
+              "      <td>112542.58</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2</th>\n",
+              "      <td>3</td>\n",
+              "      <td>15619304</td>\n",
+              "      <td>Onio</td>\n",
+              "      <td>502</td>\n",
+              "      <td>France</td>\n",
+              "      <td>Female</td>\n",
+              "      <td>42</td>\n",
+              "      <td>8</td>\n",
+              "      <td>159660.80</td>\n",
+              "      <td>3</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "      <td>113931.57</td>\n",
+              "      <td>1</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>3</th>\n",
+              "      <td>4</td>\n",
+              "      <td>15701354</td>\n",
+              "      <td>Boni</td>\n",
+              "      <td>699</td>\n",
+              "      <td>France</td>\n",
+              "      <td>Female</td>\n",
+              "      <td>39</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0.00</td>\n",
+              "      <td>2</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>93826.63</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>4</th>\n",
+              "      <td>5</td>\n",
+              "      <td>15737888</td>\n",
+              "      <td>Mitchell</td>\n",
+              "      <td>850</td>\n",
+              "      <td>Spain</td>\n",
+              "      <td>Female</td>\n",
+              "      <td>43</td>\n",
+              "      <td>2</td>\n",
+              "      <td>125510.82</td>\n",
+              "      <td>1</td>\n",
+              "      <td>1</td>\n",
+              "      <td>1</td>\n",
+              "      <td>79084.10</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>\n",
+              "      <button class=\"colab-df-convert\" onclick=\"convertToInteractive('df-651c437f-7e39-4e30-91d9-da949a18b4e7')\"\n",
+              "              title=\"Convert this dataframe to an interactive table.\"\n",
+              "              style=\"display:none;\">\n",
+              "        \n",
+              "  <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\"viewBox=\"0 0 24 24\"\n",
+              "       width=\"24px\">\n",
+              "    <path d=\"M0 0h24v24H0V0z\" fill=\"none\"/>\n",
+              "    <path d=\"M18.56 5.44l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94zm-11 1L8.5 8.5l.94-2.06 2.06-.94-2.06-.94L8.5 2.5l-.94 2.06-2.06.94zm10 10l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94z\"/><path d=\"M17.41 7.96l-1.37-1.37c-.4-.4-.92-.59-1.43-.59-.52 0-1.04.2-1.43.59L10.3 9.45l-7.72 7.72c-.78.78-.78 2.05 0 2.83L4 21.41c.39.39.9.59 1.41.59.51 0 1.02-.2 1.41-.59l7.78-7.78 2.81-2.81c.8-.78.8-2.07 0-2.86zM5.41 20L4 18.59l7.72-7.72 1.47 1.35L5.41 20z\"/>\n",
+              "  </svg>\n",
+              "      </button>\n",
+              "      \n",
+              "  <style>\n",
+              "    .colab-df-container {\n",
+              "      display:flex;\n",
+              "      flex-wrap:wrap;\n",
+              "      gap: 12px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert {\n",
+              "      background-color: #E8F0FE;\n",
+              "      border: none;\n",
+              "      border-radius: 50%;\n",
+              "      cursor: pointer;\n",
+              "      display: none;\n",
+              "      fill: #1967D2;\n",
+              "      height: 32px;\n",
+              "      padding: 0 0 0 0;\n",
+              "      width: 32px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert:hover {\n",
+              "      background-color: #E2EBFA;\n",
+              "      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);\n",
+              "      fill: #174EA6;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert {\n",
+              "      background-color: #3B4455;\n",
+              "      fill: #D2E3FC;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert:hover {\n",
+              "      background-color: #434B5C;\n",
+              "      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);\n",
+              "      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));\n",
+              "      fill: #FFFFFF;\n",
+              "    }\n",
+              "  </style>\n",
+              "\n",
+              "      <script>\n",
+              "        const buttonEl =\n",
+              "          document.querySelector('#df-651c437f-7e39-4e30-91d9-da949a18b4e7 button.colab-df-convert');\n",
+              "        buttonEl.style.display =\n",
+              "          google.colab.kernel.accessAllowed ? 'block' : 'none';\n",
+              "\n",
+              "        async function convertToInteractive(key) {\n",
+              "          const element = document.querySelector('#df-651c437f-7e39-4e30-91d9-da949a18b4e7');\n",
+              "          const dataTable =\n",
+              "            await google.colab.kernel.invokeFunction('convertToInteractive',\n",
+              "                                                     [key], {});\n",
+              "          if (!dataTable) return;\n",
+              "\n",
+              "          const docLinkHtml = 'Like what you see? Visit the ' +\n",
+              "            '<a target=\"_blank\" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'\n",
+              "            + ' to learn more about interactive tables.';\n",
+              "          element.innerHTML = '';\n",
+              "          dataTable['output_type'] = 'display_data';\n",
+              "          await google.colab.output.renderOutput(dataTable, element);\n",
+              "          const docLink = document.createElement('div');\n",
+              "          docLink.innerHTML = docLinkHtml;\n",
+              "          element.appendChild(docLink);\n",
+              "        }\n",
+              "      </script>\n",
+              "    </div>\n",
+              "  </div>\n",
+              "  "
+            ]
+          },
+          "metadata": {},
+          "execution_count": 13
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "## Divide the dataset Independent and Dependent Features\n",
+        "\n",
+        "X=df.iloc[:,3:11]\n",
+        "y=df.iloc[:,13]"
+      ],
+      "metadata": {
+        "id": "ratUNovey9rU"
+      },
+      "execution_count": 14,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "X.head()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 270
+        },
+        "id": "nI8DPfhdz5pB",
+        "outputId": "ccf5aca3-43d2-4385-a024-4133fd5b56eb"
+      },
+      "execution_count": 15,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "   CreditScore Geography  Gender  Age  Tenure    Balance  NumOfProducts  \\\n",
+              "0          619    France  Female   42       2       0.00              1   \n",
+              "1          608     Spain  Female   41       1   83807.86              1   \n",
+              "2          502    France  Female   42       8  159660.80              3   \n",
+              "3          699    France  Female   39       1       0.00              2   \n",
+              "4          850     Spain  Female   43       2  125510.82              1   \n",
+              "\n",
+              "   HasCrCard  \n",
+              "0          1  \n",
+              "1          0  \n",
+              "2          1  \n",
+              "3          0  \n",
+              "4          1  "
+            ],
+            "text/html": [
+              "\n",
+              "  <div id=\"df-a2d25f4b-b4bc-4f89-b4be-fdbc7f2818aa\">\n",
+              "    <div class=\"colab-df-container\">\n",
+              "      <div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>CreditScore</th>\n",
+              "      <th>Geography</th>\n",
+              "      <th>Gender</th>\n",
+              "      <th>Age</th>\n",
+              "      <th>Tenure</th>\n",
+              "      <th>Balance</th>\n",
+              "      <th>NumOfProducts</th>\n",
+              "      <th>HasCrCard</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td>619</td>\n",
+              "      <td>France</td>\n",
+              "      <td>Female</td>\n",
+              "      <td>42</td>\n",
+              "      <td>2</td>\n",
+              "      <td>0.00</td>\n",
+              "      <td>1</td>\n",
+              "      <td>1</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1</th>\n",
+              "      <td>608</td>\n",
+              "      <td>Spain</td>\n",
+              "      <td>Female</td>\n",
+              "      <td>41</td>\n",
+              "      <td>1</td>\n",
+              "      <td>83807.86</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2</th>\n",
+              "      <td>502</td>\n",
+              "      <td>France</td>\n",
+              "      <td>Female</td>\n",
+              "      <td>42</td>\n",
+              "      <td>8</td>\n",
+              "      <td>159660.80</td>\n",
+              "      <td>3</td>\n",
+              "      <td>1</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>3</th>\n",
+              "      <td>699</td>\n",
+              "      <td>France</td>\n",
+              "      <td>Female</td>\n",
+              "      <td>39</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0.00</td>\n",
+              "      <td>2</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>4</th>\n",
+              "      <td>850</td>\n",
+              "      <td>Spain</td>\n",
+              "      <td>Female</td>\n",
+              "      <td>43</td>\n",
+              "      <td>2</td>\n",
+              "      <td>125510.82</td>\n",
+              "      <td>1</td>\n",
+              "      <td>1</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>\n",
+              "      <button class=\"colab-df-convert\" onclick=\"convertToInteractive('df-a2d25f4b-b4bc-4f89-b4be-fdbc7f2818aa')\"\n",
+              "              title=\"Convert this dataframe to an interactive table.\"\n",
+              "              style=\"display:none;\">\n",
+              "        \n",
+              "  <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\"viewBox=\"0 0 24 24\"\n",
+              "       width=\"24px\">\n",
+              "    <path d=\"M0 0h24v24H0V0z\" fill=\"none\"/>\n",
+              "    <path d=\"M18.56 5.44l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94zm-11 1L8.5 8.5l.94-2.06 2.06-.94-2.06-.94L8.5 2.5l-.94 2.06-2.06.94zm10 10l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94z\"/><path d=\"M17.41 7.96l-1.37-1.37c-.4-.4-.92-.59-1.43-.59-.52 0-1.04.2-1.43.59L10.3 9.45l-7.72 7.72c-.78.78-.78 2.05 0 2.83L4 21.41c.39.39.9.59 1.41.59.51 0 1.02-.2 1.41-.59l7.78-7.78 2.81-2.81c.8-.78.8-2.07 0-2.86zM5.41 20L4 18.59l7.72-7.72 1.47 1.35L5.41 20z\"/>\n",
+              "  </svg>\n",
+              "      </button>\n",
+              "      \n",
+              "  <style>\n",
+              "    .colab-df-container {\n",
+              "      display:flex;\n",
+              "      flex-wrap:wrap;\n",
+              "      gap: 12px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert {\n",
+              "      background-color: #E8F0FE;\n",
+              "      border: none;\n",
+              "      border-radius: 50%;\n",
+              "      cursor: pointer;\n",
+              "      display: none;\n",
+              "      fill: #1967D2;\n",
+              "      height: 32px;\n",
+              "      padding: 0 0 0 0;\n",
+              "      width: 32px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert:hover {\n",
+              "      background-color: #E2EBFA;\n",
+              "      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);\n",
+              "      fill: #174EA6;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert {\n",
+              "      background-color: #3B4455;\n",
+              "      fill: #D2E3FC;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert:hover {\n",
+              "      background-color: #434B5C;\n",
+              "      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);\n",
+              "      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));\n",
+              "      fill: #FFFFFF;\n",
+              "    }\n",
+              "  </style>\n",
+              "\n",
+              "      <script>\n",
+              "        const buttonEl =\n",
+              "          document.querySelector('#df-a2d25f4b-b4bc-4f89-b4be-fdbc7f2818aa button.colab-df-convert');\n",
+              "        buttonEl.style.display =\n",
+              "          google.colab.kernel.accessAllowed ? 'block' : 'none';\n",
+              "\n",
+              "        async function convertToInteractive(key) {\n",
+              "          const element = document.querySelector('#df-a2d25f4b-b4bc-4f89-b4be-fdbc7f2818aa');\n",
+              "          const dataTable =\n",
+              "            await google.colab.kernel.invokeFunction('convertToInteractive',\n",
+              "                                                     [key], {});\n",
+              "          if (!dataTable) return;\n",
+              "\n",
+              "          const docLinkHtml = 'Like what you see? Visit the ' +\n",
+              "            '<a target=\"_blank\" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'\n",
+              "            + ' to learn more about interactive tables.';\n",
+              "          element.innerHTML = '';\n",
+              "          dataTable['output_type'] = 'display_data';\n",
+              "          await google.colab.output.renderOutput(dataTable, element);\n",
+              "          const docLink = document.createElement('div');\n",
+              "          docLink.innerHTML = docLinkHtml;\n",
+              "          element.appendChild(docLink);\n",
+              "        }\n",
+              "      </script>\n",
+              "    </div>\n",
+              "  </div>\n",
+              "  "
+            ]
+          },
+          "metadata": {},
+          "execution_count": 15
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "y.head()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "SeG5tt93z8Hv",
+        "outputId": "6b154cb1-c1fd-4b65-b631-26ed58cd37b1"
+      },
+      "execution_count": 16,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "0    1\n",
+              "1    0\n",
+              "2    1\n",
+              "3    0\n",
+              "4    0\n",
+              "Name: Exited, dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 16
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "## Feature Engineering \n",
+        "geography=pd.get_dummies(X['Geography'],drop_first='True')\n",
+        "gender=pd.get_dummies(X['Gender'],drop_first='True')"
+      ],
+      "metadata": {
+        "id": "YWi7S79G0O7D"
+      },
+      "execution_count": 17,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "X=X.drop(['Geography','Gender'],axis=1)"
+      ],
+      "metadata": {
+        "id": "-Gf_QawI0PFp"
+      },
+      "execution_count": 18,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "X=pd.concat([X,geography,gender],axis=1)"
+      ],
+      "metadata": {
+        "id": "LqjBh80M1lkF"
+      },
+      "execution_count": 19,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "X"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 488
+        },
+        "id": "8Ussu42i0PV9",
+        "outputId": "0d2b0490-42ca-40e4-b73b-4da10a4df159"
+      },
+      "execution_count": 20,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "      CreditScore  Age  Tenure    Balance  NumOfProducts  HasCrCard  Germany  \\\n",
+              "0             619   42       2       0.00              1          1        0   \n",
+              "1             608   41       1   83807.86              1          0        0   \n",
+              "2             502   42       8  159660.80              3          1        0   \n",
+              "3             699   39       1       0.00              2          0        0   \n",
+              "4             850   43       2  125510.82              1          1        0   \n",
+              "...           ...  ...     ...        ...            ...        ...      ...   \n",
+              "9995          771   39       5       0.00              2          1        0   \n",
+              "9996          516   35      10   57369.61              1          1        0   \n",
+              "9997          709   36       7       0.00              1          0        0   \n",
+              "9998          772   42       3   75075.31              2          1        1   \n",
+              "9999          792   28       4  130142.79              1          1        0   \n",
+              "\n",
+              "      Spain  Male  \n",
+              "0         0     0  \n",
+              "1         1     0  \n",
+              "2         0     0  \n",
+              "3         0     0  \n",
+              "4         1     0  \n",
+              "...     ...   ...  \n",
+              "9995      0     1  \n",
+              "9996      0     1  \n",
+              "9997      0     0  \n",
+              "9998      0     1  \n",
+              "9999      0     0  \n",
+              "\n",
+              "[10000 rows x 9 columns]"
+            ],
+            "text/html": [
+              "\n",
+              "  <div id=\"df-e6902de9-f0ce-424d-af3a-0a504b696220\">\n",
+              "    <div class=\"colab-df-container\">\n",
+              "      <div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>CreditScore</th>\n",
+              "      <th>Age</th>\n",
+              "      <th>Tenure</th>\n",
+              "      <th>Balance</th>\n",
+              "      <th>NumOfProducts</th>\n",
+              "      <th>HasCrCard</th>\n",
+              "      <th>Germany</th>\n",
+              "      <th>Spain</th>\n",
+              "      <th>Male</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td>619</td>\n",
+              "      <td>42</td>\n",
+              "      <td>2</td>\n",
+              "      <td>0.00</td>\n",
+              "      <td>1</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1</th>\n",
+              "      <td>608</td>\n",
+              "      <td>41</td>\n",
+              "      <td>1</td>\n",
+              "      <td>83807.86</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2</th>\n",
+              "      <td>502</td>\n",
+              "      <td>42</td>\n",
+              "      <td>8</td>\n",
+              "      <td>159660.80</td>\n",
+              "      <td>3</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>3</th>\n",
+              "      <td>699</td>\n",
+              "      <td>39</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0.00</td>\n",
+              "      <td>2</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>4</th>\n",
+              "      <td>850</td>\n",
+              "      <td>43</td>\n",
+              "      <td>2</td>\n",
+              "      <td>125510.82</td>\n",
+              "      <td>1</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>...</th>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>9995</th>\n",
+              "      <td>771</td>\n",
+              "      <td>39</td>\n",
+              "      <td>5</td>\n",
+              "      <td>0.00</td>\n",
+              "      <td>2</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>1</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>9996</th>\n",
+              "      <td>516</td>\n",
+              "      <td>35</td>\n",
+              "      <td>10</td>\n",
+              "      <td>57369.61</td>\n",
+              "      <td>1</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>1</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>9997</th>\n",
+              "      <td>709</td>\n",
+              "      <td>36</td>\n",
+              "      <td>7</td>\n",
+              "      <td>0.00</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>9998</th>\n",
+              "      <td>772</td>\n",
+              "      <td>42</td>\n",
+              "      <td>3</td>\n",
+              "      <td>75075.31</td>\n",
+              "      <td>2</td>\n",
+              "      <td>1</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "      <td>1</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>9999</th>\n",
+              "      <td>792</td>\n",
+              "      <td>28</td>\n",
+              "      <td>4</td>\n",
+              "      <td>130142.79</td>\n",
+              "      <td>1</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "<p>10000 rows × 9 columns</p>\n",
+              "</div>\n",
+              "      <button class=\"colab-df-convert\" onclick=\"convertToInteractive('df-e6902de9-f0ce-424d-af3a-0a504b696220')\"\n",
+              "              title=\"Convert this dataframe to an interactive table.\"\n",
+              "              style=\"display:none;\">\n",
+              "        \n",
+              "  <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\"viewBox=\"0 0 24 24\"\n",
+              "       width=\"24px\">\n",
+              "    <path d=\"M0 0h24v24H0V0z\" fill=\"none\"/>\n",
+              "    <path d=\"M18.56 5.44l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94zm-11 1L8.5 8.5l.94-2.06 2.06-.94-2.06-.94L8.5 2.5l-.94 2.06-2.06.94zm10 10l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94z\"/><path d=\"M17.41 7.96l-1.37-1.37c-.4-.4-.92-.59-1.43-.59-.52 0-1.04.2-1.43.59L10.3 9.45l-7.72 7.72c-.78.78-.78 2.05 0 2.83L4 21.41c.39.39.9.59 1.41.59.51 0 1.02-.2 1.41-.59l7.78-7.78 2.81-2.81c.8-.78.8-2.07 0-2.86zM5.41 20L4 18.59l7.72-7.72 1.47 1.35L5.41 20z\"/>\n",
+              "  </svg>\n",
+              "      </button>\n",
+              "      \n",
+              "  <style>\n",
+              "    .colab-df-container {\n",
+              "      display:flex;\n",
+              "      flex-wrap:wrap;\n",
+              "      gap: 12px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert {\n",
+              "      background-color: #E8F0FE;\n",
+              "      border: none;\n",
+              "      border-radius: 50%;\n",
+              "      cursor: pointer;\n",
+              "      display: none;\n",
+              "      fill: #1967D2;\n",
+              "      height: 32px;\n",
+              "      padding: 0 0 0 0;\n",
+              "      width: 32px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert:hover {\n",
+              "      background-color: #E2EBFA;\n",
+              "      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);\n",
+              "      fill: #174EA6;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert {\n",
+              "      background-color: #3B4455;\n",
+              "      fill: #D2E3FC;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert:hover {\n",
+              "      background-color: #434B5C;\n",
+              "      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);\n",
+              "      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));\n",
+              "      fill: #FFFFFF;\n",
+              "    }\n",
+              "  </style>\n",
+              "\n",
+              "      <script>\n",
+              "        const buttonEl =\n",
+              "          document.querySelector('#df-e6902de9-f0ce-424d-af3a-0a504b696220 button.colab-df-convert');\n",
+              "        buttonEl.style.display =\n",
+              "          google.colab.kernel.accessAllowed ? 'block' : 'none';\n",
+              "\n",
+              "        async function convertToInteractive(key) {\n",
+              "          const element = document.querySelector('#df-e6902de9-f0ce-424d-af3a-0a504b696220');\n",
+              "          const dataTable =\n",
+              "            await google.colab.kernel.invokeFunction('convertToInteractive',\n",
+              "                                                     [key], {});\n",
+              "          if (!dataTable) return;\n",
+              "\n",
+              "          const docLinkHtml = 'Like what you see? Visit the ' +\n",
+              "            '<a target=\"_blank\" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'\n",
+              "            + ' to learn more about interactive tables.';\n",
+              "          element.innerHTML = '';\n",
+              "          dataTable['output_type'] = 'display_data';\n",
+              "          await google.colab.output.renderOutput(dataTable, element);\n",
+              "          const docLink = document.createElement('div');\n",
+              "          docLink.innerHTML = docLinkHtml;\n",
+              "          element.appendChild(docLink);\n",
+              "        }\n",
+              "      </script>\n",
+              "    </div>\n",
+              "  </div>\n",
+              "  "
+            ]
+          },
+          "metadata": {},
+          "execution_count": 20
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Spiltting the Dataset into Training and Testing\n",
+        "\n",
+        "from sklearn.model_selection import train_test_split"
+      ],
+      "metadata": {
+        "id": "vrTAxdZv7GSc"
+      },
+      "execution_count": 21,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)"
+      ],
+      "metadata": {
+        "id": "LJCD0eP2-Aui"
+      },
+      "execution_count": 22,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "X_train"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 488
+        },
+        "id": "7qZm6mX5RXvX",
+        "outputId": "a7e023d5-dce7-44bb-e1ad-451a75674fcb"
+      },
+      "execution_count": 23,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "      CreditScore  Age  Tenure    Balance  NumOfProducts  HasCrCard  Germany  \\\n",
+              "7389          667   34       5       0.00              2          1        0   \n",
+              "9275          427   42       1   75681.52              1          1        1   \n",
+              "2995          535   29       2  112367.34              1          1        0   \n",
+              "5316          654   40       5  105683.63              1          1        0   \n",
+              "356           850   57       8  126776.30              2          1        0   \n",
+              "...           ...  ...     ...        ...            ...        ...      ...   \n",
+              "9225          594   32       4  120074.97              2          1        1   \n",
+              "4859          794   22       4  114440.24              1          1        0   \n",
+              "3264          738   35       5  161274.05              2          1        0   \n",
+              "9845          590   38       9       0.00              2          1        0   \n",
+              "2732          623   48       1  108076.33              1          1        1   \n",
+              "\n",
+              "      Spain  Male  \n",
+              "7389      1     0  \n",
+              "9275      0     1  \n",
+              "2995      0     0  \n",
+              "5316      1     1  \n",
+              "356       1     0  \n",
+              "...     ...   ...  \n",
+              "9225      0     0  \n",
+              "4859      1     0  \n",
+              "3264      0     1  \n",
+              "9845      1     0  \n",
+              "2732      0     0  \n",
+              "\n",
+              "[8000 rows x 9 columns]"
+            ],
+            "text/html": [
+              "\n",
+              "  <div id=\"df-b9ef499d-1aa9-4639-97ff-a8fe98c43575\">\n",
+              "    <div class=\"colab-df-container\">\n",
+              "      <div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>CreditScore</th>\n",
+              "      <th>Age</th>\n",
+              "      <th>Tenure</th>\n",
+              "      <th>Balance</th>\n",
+              "      <th>NumOfProducts</th>\n",
+              "      <th>HasCrCard</th>\n",
+              "      <th>Germany</th>\n",
+              "      <th>Spain</th>\n",
+              "      <th>Male</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>7389</th>\n",
+              "      <td>667</td>\n",
+              "      <td>34</td>\n",
+              "      <td>5</td>\n",
+              "      <td>0.00</td>\n",
+              "      <td>2</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>9275</th>\n",
+              "      <td>427</td>\n",
+              "      <td>42</td>\n",
+              "      <td>1</td>\n",
+              "      <td>75681.52</td>\n",
+              "      <td>1</td>\n",
+              "      <td>1</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "      <td>1</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2995</th>\n",
+              "      <td>535</td>\n",
+              "      <td>29</td>\n",
+              "      <td>2</td>\n",
+              "      <td>112367.34</td>\n",
+              "      <td>1</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>5316</th>\n",
+              "      <td>654</td>\n",
+              "      <td>40</td>\n",
+              "      <td>5</td>\n",
+              "      <td>105683.63</td>\n",
+              "      <td>1</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "      <td>1</td>\n",
+              "      <td>1</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>356</th>\n",
+              "      <td>850</td>\n",
+              "      <td>57</td>\n",
+              "      <td>8</td>\n",
+              "      <td>126776.30</td>\n",
+              "      <td>2</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>...</th>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>9225</th>\n",
+              "      <td>594</td>\n",
+              "      <td>32</td>\n",
+              "      <td>4</td>\n",
+              "      <td>120074.97</td>\n",
+              "      <td>2</td>\n",
+              "      <td>1</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>4859</th>\n",
+              "      <td>794</td>\n",
+              "      <td>22</td>\n",
+              "      <td>4</td>\n",
+              "      <td>114440.24</td>\n",
+              "      <td>1</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>3264</th>\n",
+              "      <td>738</td>\n",
+              "      <td>35</td>\n",
+              "      <td>5</td>\n",
+              "      <td>161274.05</td>\n",
+              "      <td>2</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>1</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>9845</th>\n",
+              "      <td>590</td>\n",
+              "      <td>38</td>\n",
+              "      <td>9</td>\n",
+              "      <td>0.00</td>\n",
+              "      <td>2</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2732</th>\n",
+              "      <td>623</td>\n",
+              "      <td>48</td>\n",
+              "      <td>1</td>\n",
+              "      <td>108076.33</td>\n",
+              "      <td>1</td>\n",
+              "      <td>1</td>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "<p>8000 rows × 9 columns</p>\n",
+              "</div>\n",
+              "      <button class=\"colab-df-convert\" onclick=\"convertToInteractive('df-b9ef499d-1aa9-4639-97ff-a8fe98c43575')\"\n",
+              "              title=\"Convert this dataframe to an interactive table.\"\n",
+              "              style=\"display:none;\">\n",
+              "        \n",
+              "  <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\"viewBox=\"0 0 24 24\"\n",
+              "       width=\"24px\">\n",
+              "    <path d=\"M0 0h24v24H0V0z\" fill=\"none\"/>\n",
+              "    <path d=\"M18.56 5.44l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94zm-11 1L8.5 8.5l.94-2.06 2.06-.94-2.06-.94L8.5 2.5l-.94 2.06-2.06.94zm10 10l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94z\"/><path d=\"M17.41 7.96l-1.37-1.37c-.4-.4-.92-.59-1.43-.59-.52 0-1.04.2-1.43.59L10.3 9.45l-7.72 7.72c-.78.78-.78 2.05 0 2.83L4 21.41c.39.39.9.59 1.41.59.51 0 1.02-.2 1.41-.59l7.78-7.78 2.81-2.81c.8-.78.8-2.07 0-2.86zM5.41 20L4 18.59l7.72-7.72 1.47 1.35L5.41 20z\"/>\n",
+              "  </svg>\n",
+              "      </button>\n",
+              "      \n",
+              "  <style>\n",
+              "    .colab-df-container {\n",
+              "      display:flex;\n",
+              "      flex-wrap:wrap;\n",
+              "      gap: 12px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert {\n",
+              "      background-color: #E8F0FE;\n",
+              "      border: none;\n",
+              "      border-radius: 50%;\n",
+              "      cursor: pointer;\n",
+              "      display: none;\n",
+              "      fill: #1967D2;\n",
+              "      height: 32px;\n",
+              "      padding: 0 0 0 0;\n",
+              "      width: 32px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert:hover {\n",
+              "      background-color: #E2EBFA;\n",
+              "      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);\n",
+              "      fill: #174EA6;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert {\n",
+              "      background-color: #3B4455;\n",
+              "      fill: #D2E3FC;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert:hover {\n",
+              "      background-color: #434B5C;\n",
+              "      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);\n",
+              "      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));\n",
+              "      fill: #FFFFFF;\n",
+              "    }\n",
+              "  </style>\n",
+              "\n",
+              "      <script>\n",
+              "        const buttonEl =\n",
+              "          document.querySelector('#df-b9ef499d-1aa9-4639-97ff-a8fe98c43575 button.colab-df-convert');\n",
+              "        buttonEl.style.display =\n",
+              "          google.colab.kernel.accessAllowed ? 'block' : 'none';\n",
+              "\n",
+              "        async function convertToInteractive(key) {\n",
+              "          const element = document.querySelector('#df-b9ef499d-1aa9-4639-97ff-a8fe98c43575');\n",
+              "          const dataTable =\n",
+              "            await google.colab.kernel.invokeFunction('convertToInteractive',\n",
+              "                                                     [key], {});\n",
+              "          if (!dataTable) return;\n",
+              "\n",
+              "          const docLinkHtml = 'Like what you see? Visit the ' +\n",
+              "            '<a target=\"_blank\" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'\n",
+              "            + ' to learn more about interactive tables.';\n",
+              "          element.innerHTML = '';\n",
+              "          dataTable['output_type'] = 'display_data';\n",
+              "          await google.colab.output.renderOutput(dataTable, element);\n",
+              "          const docLink = document.createElement('div');\n",
+              "          docLink.innerHTML = docLinkHtml;\n",
+              "          element.appendChild(docLink);\n",
+              "        }\n",
+              "      </script>\n",
+              "    </div>\n",
+              "  </div>\n",
+              "  "
+            ]
+          },
+          "metadata": {},
+          "execution_count": 23
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "pip install standard-scaler"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "XWb0NqHQSO48",
+        "outputId": "add4be6e-978c-4f90-e7aa-343c6fbd9850"
+      },
+      "execution_count": 24,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Looking in indexes: https://pypi.org/simple, https://us-python.pkg.dev/colab-wheels/public/simple/\n",
+            "Requirement already satisfied: standard-scaler in /usr/local/lib/python3.9/dist-packages (0.3)\n",
+            "Requirement already satisfied: numpy in /usr/local/lib/python3.9/dist-packages (from standard-scaler) (1.22.4)\n",
+            "\u001b[33mWARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv\u001b[0m\u001b[33m\n",
+            "\u001b[0m"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from sklearn.preprocessing import StandardScaler\n"
+      ],
+      "metadata": {
+        "id": "FSp7ZuVhSdhJ"
+      },
+      "execution_count": 26,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "sc=StandardScaler()"
+      ],
+      "metadata": {
+        "id": "0ojs3-Y6SFuT"
+      },
+      "execution_count": 27,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "X_train=sc.fit_transform(X_train)"
+      ],
+      "metadata": {
+        "id": "sgayNEWWSOBe"
+      },
+      "execution_count": 28,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "X_test=sc.transform(X_test)"
+      ],
+      "metadata": {
+        "id": "4Kv1fywMTE8_"
+      },
+      "execution_count": 29,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "## Part 2 Now we create ANN"
+      ],
+      "metadata": {
+        "id": "KLLJeN_oTPHx"
+      },
+      "execution_count": 30,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from tensorflow.keras.models import Sequential\n",
+        "from tensorflow.keras.layers import Dense\n",
+        "from tensorflow.keras.layers import Dense, LeakyReLU, PReLU, ELU, ReLU, Dropout\n",
+        "#from tensorflow.keras.layers import dropout"
+      ],
+      "metadata": {
+        "id": "cJOuiInGUoK5"
+      },
+      "execution_count": 31,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "classifier=Sequential()"
+      ],
+      "metadata": {
+        "id": "GXd82asxc7Xt"
+      },
+      "execution_count": 32,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "## Adding the Input Layer \n",
+        "\n",
+        "classifier.add(Dense(units=11,activation='relu'))"
+      ],
+      "metadata": {
+        "id": "7X2b01HrdHBI"
+      },
+      "execution_count": 33,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "## Adding the first hidden layer\n",
+        "\n",
+        "classifier.add(Dense(units=7,activation='relu'))"
+      ],
+      "metadata": {
+        "id": "sOD_0wXJc88T"
+      },
+      "execution_count": 34,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "## Adding the second hidden layer\n",
+        "classifier.add(Dense(units=6,activation='relu'))"
+      ],
+      "metadata": {
+        "id": "wd7FNPK1eXNg"
+      },
+      "execution_count": 35,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "## Adding the output layer\n",
+        "classifier.add(Dense(units=1,activation='sigmoid'))"
+      ],
+      "metadata": {
+        "id": "oYHLC-_lekEC"
+      },
+      "execution_count": 36,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "classifier.compile(optimizer='adam',loss='binary_crossentropy',metrics=['accuracy'])"
+      ],
+      "metadata": {
+        "id": "CIL17wIke1DE"
+      },
+      "execution_count": 37,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#import tensorflow\n",
+        "#opt=tensorflow.keras.optimizers.Adam(learning_rate=0.01)"
+      ],
+      "metadata": {
+        "id": "OrrwqeB9fHd7"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "## early stopping \n",
+        "import tensorflow as tf\n",
+        "early_stopping=tf.keras.callbacks.EarlyStopping(\n",
+        "    monitor=\"val_loss\",\n",
+        "    min_delta=0.0001,\n",
+        "    patience=20,\n",
+        "    verbose=1,\n",
+        "    mode=\"auto\",\n",
+        "    baseline=None,\n",
+        "    restore_best_weights=False,\n",
+        ")"
+      ],
+      "metadata": {
+        "id": "oBwR_f3-2waV"
+      },
+      "execution_count": 38,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "model_history=classifier.fit(X_train,y_train,validation_split=0.33,epochs=1000,callbacks=early_stopping)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "_cUJ2eUd0zDj",
+        "outputId": "dc085327-ae79-4716-f6f7-d4b8c22da7ea"
+      },
+      "execution_count": 39,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Epoch 1/1000\n",
+            "168/168 [==============================] - 4s 8ms/step - loss: 0.5559 - accuracy: 0.7565 - val_loss: 0.4766 - val_accuracy: 0.7955\n",
+            "Epoch 2/1000\n",
+            "168/168 [==============================] - 1s 6ms/step - loss: 0.4610 - accuracy: 0.7983 - val_loss: 0.4465 - val_accuracy: 0.7986\n",
+            "Epoch 3/1000\n",
+            "168/168 [==============================] - 1s 5ms/step - loss: 0.4378 - accuracy: 0.8013 - val_loss: 0.4367 - val_accuracy: 0.8039\n",
+            "Epoch 4/1000\n",
+            "168/168 [==============================] - 1s 5ms/step - loss: 0.4273 - accuracy: 0.8067 - val_loss: 0.4290 - val_accuracy: 0.8107\n",
+            "Epoch 5/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.4185 - accuracy: 0.8130 - val_loss: 0.4216 - val_accuracy: 0.8213\n",
+            "Epoch 6/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.4094 - accuracy: 0.8207 - val_loss: 0.4130 - val_accuracy: 0.8300\n",
+            "Epoch 7/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3975 - accuracy: 0.8319 - val_loss: 0.4031 - val_accuracy: 0.8357\n",
+            "Epoch 8/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3852 - accuracy: 0.8362 - val_loss: 0.3941 - val_accuracy: 0.8353\n",
+            "Epoch 9/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3756 - accuracy: 0.8403 - val_loss: 0.3924 - val_accuracy: 0.8266\n",
+            "Epoch 10/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3698 - accuracy: 0.8425 - val_loss: 0.3835 - val_accuracy: 0.8364\n",
+            "Epoch 11/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3654 - accuracy: 0.8446 - val_loss: 0.3805 - val_accuracy: 0.8391\n",
+            "Epoch 12/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3626 - accuracy: 0.8453 - val_loss: 0.3780 - val_accuracy: 0.8436\n",
+            "Epoch 13/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3596 - accuracy: 0.8442 - val_loss: 0.3770 - val_accuracy: 0.8391\n",
+            "Epoch 14/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3581 - accuracy: 0.8464 - val_loss: 0.3772 - val_accuracy: 0.8383\n",
+            "Epoch 15/1000\n",
+            "168/168 [==============================] - 1s 5ms/step - loss: 0.3570 - accuracy: 0.8477 - val_loss: 0.3761 - val_accuracy: 0.8421\n",
+            "Epoch 16/1000\n",
+            "168/168 [==============================] - 1s 5ms/step - loss: 0.3561 - accuracy: 0.8477 - val_loss: 0.3752 - val_accuracy: 0.8440\n",
+            "Epoch 17/1000\n",
+            "168/168 [==============================] - 1s 6ms/step - loss: 0.3547 - accuracy: 0.8461 - val_loss: 0.3745 - val_accuracy: 0.8444\n",
+            "Epoch 18/1000\n",
+            "168/168 [==============================] - 1s 6ms/step - loss: 0.3542 - accuracy: 0.8498 - val_loss: 0.3734 - val_accuracy: 0.8463\n",
+            "Epoch 19/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3524 - accuracy: 0.8481 - val_loss: 0.3730 - val_accuracy: 0.8440\n",
+            "Epoch 20/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3518 - accuracy: 0.8489 - val_loss: 0.3728 - val_accuracy: 0.8455\n",
+            "Epoch 21/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3509 - accuracy: 0.8490 - val_loss: 0.3726 - val_accuracy: 0.8448\n",
+            "Epoch 22/1000\n",
+            "168/168 [==============================] - 1s 5ms/step - loss: 0.3514 - accuracy: 0.8483 - val_loss: 0.3722 - val_accuracy: 0.8463\n",
+            "Epoch 23/1000\n",
+            "168/168 [==============================] - 1s 5ms/step - loss: 0.3501 - accuracy: 0.8509 - val_loss: 0.3717 - val_accuracy: 0.8455\n",
+            "Epoch 24/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3491 - accuracy: 0.8496 - val_loss: 0.3714 - val_accuracy: 0.8466\n",
+            "Epoch 25/1000\n",
+            "168/168 [==============================] - 1s 5ms/step - loss: 0.3481 - accuracy: 0.8515 - val_loss: 0.3722 - val_accuracy: 0.8485\n",
+            "Epoch 26/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3476 - accuracy: 0.8507 - val_loss: 0.3712 - val_accuracy: 0.8470\n",
+            "Epoch 27/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3474 - accuracy: 0.8505 - val_loss: 0.3721 - val_accuracy: 0.8402\n",
+            "Epoch 28/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3468 - accuracy: 0.8509 - val_loss: 0.3723 - val_accuracy: 0.8387\n",
+            "Epoch 29/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3462 - accuracy: 0.8503 - val_loss: 0.3701 - val_accuracy: 0.8470\n",
+            "Epoch 30/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3454 - accuracy: 0.8496 - val_loss: 0.3704 - val_accuracy: 0.8478\n",
+            "Epoch 31/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3454 - accuracy: 0.8530 - val_loss: 0.3704 - val_accuracy: 0.8432\n",
+            "Epoch 32/1000\n",
+            "168/168 [==============================] - 1s 6ms/step - loss: 0.3450 - accuracy: 0.8500 - val_loss: 0.3702 - val_accuracy: 0.8466\n",
+            "Epoch 33/1000\n",
+            "168/168 [==============================] - 1s 7ms/step - loss: 0.3452 - accuracy: 0.8533 - val_loss: 0.3700 - val_accuracy: 0.8455\n",
+            "Epoch 34/1000\n",
+            "168/168 [==============================] - 1s 5ms/step - loss: 0.3447 - accuracy: 0.8517 - val_loss: 0.3694 - val_accuracy: 0.8451\n",
+            "Epoch 35/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3446 - accuracy: 0.8500 - val_loss: 0.3689 - val_accuracy: 0.8470\n",
+            "Epoch 36/1000\n",
+            "168/168 [==============================] - 1s 5ms/step - loss: 0.3444 - accuracy: 0.8526 - val_loss: 0.3695 - val_accuracy: 0.8440\n",
+            "Epoch 37/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3440 - accuracy: 0.8524 - val_loss: 0.3690 - val_accuracy: 0.8440\n",
+            "Epoch 38/1000\n",
+            "168/168 [==============================] - 1s 5ms/step - loss: 0.3429 - accuracy: 0.8517 - val_loss: 0.3712 - val_accuracy: 0.8451\n",
+            "Epoch 39/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3433 - accuracy: 0.8541 - val_loss: 0.3699 - val_accuracy: 0.8451\n",
+            "Epoch 40/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3426 - accuracy: 0.8517 - val_loss: 0.3690 - val_accuracy: 0.8440\n",
+            "Epoch 41/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3433 - accuracy: 0.8545 - val_loss: 0.3685 - val_accuracy: 0.8448\n",
+            "Epoch 42/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3427 - accuracy: 0.8528 - val_loss: 0.3687 - val_accuracy: 0.8455\n",
+            "Epoch 43/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3422 - accuracy: 0.8522 - val_loss: 0.3718 - val_accuracy: 0.8425\n",
+            "Epoch 44/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3435 - accuracy: 0.8528 - val_loss: 0.3686 - val_accuracy: 0.8463\n",
+            "Epoch 45/1000\n",
+            "168/168 [==============================] - 1s 5ms/step - loss: 0.3422 - accuracy: 0.8545 - val_loss: 0.3684 - val_accuracy: 0.8470\n",
+            "Epoch 46/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3424 - accuracy: 0.8545 - val_loss: 0.3696 - val_accuracy: 0.8459\n",
+            "Epoch 47/1000\n",
+            "168/168 [==============================] - 1s 6ms/step - loss: 0.3419 - accuracy: 0.8517 - val_loss: 0.3693 - val_accuracy: 0.8459\n",
+            "Epoch 48/1000\n",
+            "168/168 [==============================] - 1s 6ms/step - loss: 0.3423 - accuracy: 0.8503 - val_loss: 0.3682 - val_accuracy: 0.8463\n",
+            "Epoch 49/1000\n",
+            "168/168 [==============================] - 1s 7ms/step - loss: 0.3418 - accuracy: 0.8548 - val_loss: 0.3686 - val_accuracy: 0.8448\n",
+            "Epoch 50/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3415 - accuracy: 0.8552 - val_loss: 0.3683 - val_accuracy: 0.8482\n",
+            "Epoch 51/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3420 - accuracy: 0.8530 - val_loss: 0.3691 - val_accuracy: 0.8448\n",
+            "Epoch 52/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3407 - accuracy: 0.8541 - val_loss: 0.3688 - val_accuracy: 0.8440\n",
+            "Epoch 53/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3409 - accuracy: 0.8530 - val_loss: 0.3690 - val_accuracy: 0.8474\n",
+            "Epoch 54/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3417 - accuracy: 0.8520 - val_loss: 0.3688 - val_accuracy: 0.8470\n",
+            "Epoch 55/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3410 - accuracy: 0.8546 - val_loss: 0.3687 - val_accuracy: 0.8455\n",
+            "Epoch 56/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3413 - accuracy: 0.8543 - val_loss: 0.3675 - val_accuracy: 0.8463\n",
+            "Epoch 57/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3406 - accuracy: 0.8546 - val_loss: 0.3715 - val_accuracy: 0.8432\n",
+            "Epoch 58/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3404 - accuracy: 0.8545 - val_loss: 0.3689 - val_accuracy: 0.8455\n",
+            "Epoch 59/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3407 - accuracy: 0.8543 - val_loss: 0.3686 - val_accuracy: 0.8463\n",
+            "Epoch 60/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3404 - accuracy: 0.8530 - val_loss: 0.3692 - val_accuracy: 0.8451\n",
+            "Epoch 61/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3408 - accuracy: 0.8552 - val_loss: 0.3683 - val_accuracy: 0.8463\n",
+            "Epoch 62/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3397 - accuracy: 0.8548 - val_loss: 0.3698 - val_accuracy: 0.8448\n",
+            "Epoch 63/1000\n",
+            "168/168 [==============================] - 1s 7ms/step - loss: 0.3405 - accuracy: 0.8541 - val_loss: 0.3682 - val_accuracy: 0.8463\n",
+            "Epoch 64/1000\n",
+            "168/168 [==============================] - 1s 7ms/step - loss: 0.3402 - accuracy: 0.8541 - val_loss: 0.3683 - val_accuracy: 0.8448\n",
+            "Epoch 65/1000\n",
+            "168/168 [==============================] - 1s 5ms/step - loss: 0.3396 - accuracy: 0.8533 - val_loss: 0.3678 - val_accuracy: 0.8459\n",
+            "Epoch 66/1000\n",
+            "168/168 [==============================] - 1s 5ms/step - loss: 0.3399 - accuracy: 0.8531 - val_loss: 0.3677 - val_accuracy: 0.8451\n",
+            "Epoch 67/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3394 - accuracy: 0.8533 - val_loss: 0.3709 - val_accuracy: 0.8448\n",
+            "Epoch 68/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3393 - accuracy: 0.8528 - val_loss: 0.3680 - val_accuracy: 0.8440\n",
+            "Epoch 69/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3397 - accuracy: 0.8550 - val_loss: 0.3685 - val_accuracy: 0.8448\n",
+            "Epoch 70/1000\n",
+            "168/168 [==============================] - 1s 5ms/step - loss: 0.3399 - accuracy: 0.8522 - val_loss: 0.3679 - val_accuracy: 0.8466\n",
+            "Epoch 71/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3391 - accuracy: 0.8550 - val_loss: 0.3692 - val_accuracy: 0.8470\n",
+            "Epoch 72/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3392 - accuracy: 0.8563 - val_loss: 0.3685 - val_accuracy: 0.8440\n",
+            "Epoch 73/1000\n",
+            "168/168 [==============================] - 1s 6ms/step - loss: 0.3390 - accuracy: 0.8524 - val_loss: 0.3679 - val_accuracy: 0.8466\n",
+            "Epoch 74/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3396 - accuracy: 0.8546 - val_loss: 0.3674 - val_accuracy: 0.8451\n",
+            "Epoch 75/1000\n",
+            "168/168 [==============================] - 1s 5ms/step - loss: 0.3393 - accuracy: 0.8559 - val_loss: 0.3692 - val_accuracy: 0.8466\n",
+            "Epoch 76/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3385 - accuracy: 0.8558 - val_loss: 0.3711 - val_accuracy: 0.8455\n",
+            "Epoch 77/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3400 - accuracy: 0.8561 - val_loss: 0.3681 - val_accuracy: 0.8463\n",
+            "Epoch 78/1000\n",
+            "168/168 [==============================] - 1s 7ms/step - loss: 0.3393 - accuracy: 0.8545 - val_loss: 0.3700 - val_accuracy: 0.8455\n",
+            "Epoch 79/1000\n",
+            "168/168 [==============================] - 1s 7ms/step - loss: 0.3389 - accuracy: 0.8541 - val_loss: 0.3685 - val_accuracy: 0.8478\n",
+            "Epoch 80/1000\n",
+            "168/168 [==============================] - 1s 5ms/step - loss: 0.3387 - accuracy: 0.8558 - val_loss: 0.3685 - val_accuracy: 0.8459\n",
+            "Epoch 81/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3389 - accuracy: 0.8548 - val_loss: 0.3689 - val_accuracy: 0.8451\n",
+            "Epoch 82/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3386 - accuracy: 0.8558 - val_loss: 0.3677 - val_accuracy: 0.8474\n",
+            "Epoch 83/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3386 - accuracy: 0.8543 - val_loss: 0.3705 - val_accuracy: 0.8436\n",
+            "Epoch 84/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3389 - accuracy: 0.8537 - val_loss: 0.3681 - val_accuracy: 0.8463\n",
+            "Epoch 85/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3380 - accuracy: 0.8554 - val_loss: 0.3745 - val_accuracy: 0.8448\n",
+            "Epoch 86/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3396 - accuracy: 0.8520 - val_loss: 0.3699 - val_accuracy: 0.8474\n",
+            "Epoch 87/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3381 - accuracy: 0.8548 - val_loss: 0.3677 - val_accuracy: 0.8444\n",
+            "Epoch 88/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3378 - accuracy: 0.8535 - val_loss: 0.3690 - val_accuracy: 0.8455\n",
+            "Epoch 89/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3381 - accuracy: 0.8537 - val_loss: 0.3685 - val_accuracy: 0.8459\n",
+            "Epoch 90/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3381 - accuracy: 0.8522 - val_loss: 0.3687 - val_accuracy: 0.8436\n",
+            "Epoch 91/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3378 - accuracy: 0.8571 - val_loss: 0.3692 - val_accuracy: 0.8451\n",
+            "Epoch 92/1000\n",
+            "168/168 [==============================] - 1s 4ms/step - loss: 0.3384 - accuracy: 0.8530 - val_loss: 0.3685 - val_accuracy: 0.8451\n",
+            "Epoch 93/1000\n",
+            "168/168 [==============================] - 1s 5ms/step - loss: 0.3374 - accuracy: 0.8541 - val_loss: 0.3690 - val_accuracy: 0.8466\n",
+            "Epoch 94/1000\n",
+            "168/168 [==============================] - 1s 7ms/step - loss: 0.3374 - accuracy: 0.8535 - val_loss: 0.3680 - val_accuracy: 0.8470\n",
+            "Epoch 94: early stopping\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "model_history.history.keys()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "-MFFxFF813P5",
+        "outputId": "10556ec6-a8d2-4bf1-cf3a-ff00df484fb3"
+      },
+      "execution_count": 41,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "dict_keys(['loss', 'accuracy', 'val_loss', 'val_accuracy'])"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 41
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "y_pred=classifier.predict(X_test)\n",
+        "y_pred=(y_pred>=0.5)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Q3woXofW44m0",
+        "outputId": "7d632ae9-5576-496c-c98b-df1da5335474"
+      },
+      "execution_count": 43,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "63/63 [==============================] - 0s 1ms/step\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#make the confusion matrix\n",
+        "from sklearn.metrics import confusion_matrix\n",
+        "cm=confusion_matrix(y_test,y_pred)\n",
+        "cm"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "o-XNvcXz5Z6g",
+        "outputId": "87355424-44ed-4bd3-8bdd-38f374605d59"
+      },
+      "execution_count": 44,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "array([[1520,   75],\n",
+              "       [ 232,  173]])"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 44
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#Calculate the accuracy\n",
+        "from sklearn.metrics import accuracy_score\n",
+        "score=accuracy_score(y_pred,y_test)"
+      ],
+      "metadata": {
+        "id": "fLD_79hX5vAE"
+      },
+      "execution_count": 45,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "score"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "sI3GugNp6DKd",
+        "outputId": "2752c3c9-679c-431c-82a2-47eda9b9380d"
+      },
+      "execution_count": 46,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "0.8465"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 46
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#gets the weights\n",
+        "classifier.get_weights()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "DQ0c11Sy6IBK",
+        "outputId": "cdd5f443-93a4-46dd-df68-1a182081d769"
+      },
+      "execution_count": 48,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[array([[ 0.1368738 , -0.20008382,  0.07883739, -0.07347075, -0.09306124,\n",
+              "         -0.0462622 , -0.17284943,  0.18826394, -0.07717969,  0.09347575,\n",
+              "          0.03209187],\n",
+              "        [ 0.56704456,  0.0515003 , -0.47653526,  0.78744274,  0.09112261,\n",
+              "          0.59490806, -0.7648812 , -0.3849358 ,  0.7983106 , -0.4286824 ,\n",
+              "          0.17885618],\n",
+              "        [ 0.21438703, -0.01480249,  0.11412892,  0.03791155,  0.1802284 ,\n",
+              "         -0.1094136 ,  0.40912053, -0.22091421, -0.43707985,  0.07010358,\n",
+              "          0.11313101],\n",
+              "        [-0.59564006,  0.29874164, -0.05057667,  0.0103426 , -0.84006184,\n",
+              "          0.2693438 ,  0.2671057 ,  0.25249854,  0.5253947 ,  0.806114  ,\n",
+              "         -0.08453558],\n",
+              "        [-0.1751513 , -0.28445584, -0.15997073,  1.0910969 , -0.15213615,\n",
+              "          0.5109921 , -0.24468987,  0.7324643 ,  0.02043675, -0.04066022,\n",
+              "         -0.9200969 ],\n",
+              "        [-0.17840953,  0.7454928 ,  0.57352513, -0.01051411, -0.33503217,\n",
+              "          0.05237554, -0.49133697, -0.5261205 , -0.14167917,  0.24180186,\n",
+              "          0.09785444],\n",
+              "        [-0.28499234, -0.23921952, -0.09359603, -0.08296047, -0.56195027,\n",
+              "         -0.13968045, -0.32922202,  0.19815987,  0.38392764,  0.15766983,\n",
+              "          0.11272996],\n",
+              "        [ 0.04296532,  0.43781027, -0.02756588, -0.02853137, -0.01856427,\n",
+              "          0.36623937,  0.42244673, -0.3793868 , -0.451676  , -0.11427347,\n",
+              "          0.14478953],\n",
+              "        [ 0.5949969 , -0.05916369,  0.17418501, -0.00323385,  0.16131786,\n",
+              "          0.2875989 ,  0.22933316,  0.06730005,  0.1673061 , -0.0225971 ,\n",
+              "          0.01734219]], dtype=float32),\n",
+              " array([ 0.01680367,  0.07703618,  0.4385292 , -0.19602965,  0.4393262 ,\n",
+              "        -0.3931577 , -0.10709622,  0.69789606, -0.14305332, -0.4665135 ,\n",
+              "        -0.04019599], dtype=float32),\n",
+              " array([[ 0.31792602,  0.05620796, -0.04187636,  0.09741076, -0.47924277,\n",
+              "         -0.0494627 , -0.16809082],\n",
+              "        [-0.2163836 ,  0.12640515,  0.14422797,  0.18836685, -0.40341854,\n",
+              "          0.4273238 , -0.20509844],\n",
+              "        [ 0.70441496,  0.57186526, -0.13035141,  0.02873881,  0.06475175,\n",
+              "          0.2844432 , -0.11237302],\n",
+              "        [-0.05671049,  0.4932202 , -1.2889482 , -0.4357194 ,  0.49412322,\n",
+              "         -0.13421017,  0.40608928],\n",
+              "        [ 0.5154444 , -0.42543858,  0.4254297 ,  0.48527986, -0.5846712 ,\n",
+              "         -0.02674849, -0.23084946],\n",
+              "        [-0.2361777 ,  0.23483993, -0.30494764, -1.0958343 ,  0.36081228,\n",
+              "         -0.22518711,  0.32665846],\n",
+              "        [ 0.29454267, -0.83479154, -0.38338318, -0.15672229,  0.07095763,\n",
+              "         -0.18244545, -0.7303564 ],\n",
+              "        [ 0.36248195, -0.73647165, -0.226968  , -0.57522017,  0.26352048,\n",
+              "          0.5056    ,  0.64860445],\n",
+              "        [ 0.23524122,  0.25272825,  0.4921873 ,  0.18923157, -0.58333963,\n",
+              "         -0.31673908, -0.17382239],\n",
+              "        [-0.3370175 ,  0.5965339 , -0.08603591, -0.43710363,  0.3112541 ,\n",
+              "         -0.54495794, -1.151827  ],\n",
+              "        [-0.31447873,  0.47562125,  0.71460664, -0.11296169,  0.26792216,\n",
+              "         -0.46996847,  0.13588755]], dtype=float32),\n",
+              " array([ 0.45831266,  0.12355621,  0.01913027, -0.12135547,  0.04763013,\n",
+              "         0.40052927,  0.00667261], dtype=float32),\n",
+              " array([[-0.34622824, -0.06154615,  0.41923797,  0.7048294 ,  0.75099117,\n",
+              "          0.8563001 ],\n",
+              "        [-0.36624026, -0.02525131, -0.24537496,  0.33427542,  0.13135849,\n",
+              "          0.19663759],\n",
+              "        [ 0.2607558 ,  0.5810083 ,  0.54777294, -0.11193343, -0.7919238 ,\n",
+              "         -0.5158366 ],\n",
+              "        [ 0.6233655 ,  0.4927753 ,  0.11122086, -0.11611485, -0.06670254,\n",
+              "          0.07078473],\n",
+              "        [ 0.7803136 ,  0.82031846,  0.60391146,  0.32535625, -0.52402234,\n",
+              "          0.09755915],\n",
+              "        [-0.85035473, -0.45216158, -0.45882997,  0.8508875 , -0.2776506 ,\n",
+              "          0.15884526],\n",
+              "        [ 0.66826236,  0.22030935,  0.74254924, -0.00553629,  0.01346052,\n",
+              "         -0.5936475 ]], dtype=float32),\n",
+              " array([ 0.10872146,  0.08383738, -0.0871326 ,  0.17082192,  0.34832498,\n",
+              "         0.31303975], dtype=float32),\n",
+              " array([[ 1.1349276 ],\n",
+              "        [ 1.1245067 ],\n",
+              "        [ 0.9131676 ],\n",
+              "        [-0.8644345 ],\n",
+              "        [-0.32438245],\n",
+              "        [-0.5912899 ]], dtype=float32),\n",
+              " array([-0.16949324], dtype=float32)]"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 48
+        }
+      ]
+    }
+  ]
+}
